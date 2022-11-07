@@ -1,0 +1,8 @@
+__pycache__
+.pytest_cache
+.venv
+.vscode/settings.json
+.vscode/launch.json
+*local_only*
+gasaansluitingen.txt
+*.xlsx
