@@ -40,6 +40,7 @@ DATA = {
         2020: {},
         2021: {},
         2022: {},
+        2023: {},
     },
     "enexis": {
         2010: {"separator": ";"},
@@ -55,11 +56,29 @@ DATA = {
         2020: {"separator": ";"},
         2021: {"separator": ";"},
         2022: {"separator": ";"},
+        2023: {"separator": ";"},
+    },
+    "westland-infra": {
+        2011: {"separator": "\t"},
+        2012: {"separator": "\t"},
+        2013: {"separator": "\t"},
+        2014: {"separator": "\t"},
+        2015: {"separator": "\t"},
+        2016: {"separator": "\t"},
+        2017: {"separator": "\t"},
+        2018: {"separator": "\t"},
+        2019: {"separator": "\t"},
+        2020: {"separator": "\t"},
+        2021: {"separator": "\t"},
+        2022: {"separator": "\t"},
+        2023: {"separator": "\t"},
     },
 }
 
 COLUMN_MAP = {
     "Aantal Aansluitingen": "AANSLUITINGEN_AANTAL",
+    "Aantal aansluitingen": "AANSLUITINGEN_AANTAL",
+    "aantal aansluitingen": "AANSLUITINGEN_AANTAL",
     "%Leveringsrichting": "LEVERINGSRICHTING_PERC",
     "%Fysieke status": "FYSIEKE_STATUS_PERC",
     "%Soort aansluiting": "SOORT_AANSLUITING_PERC",
@@ -98,6 +117,9 @@ def get_active_connections(df) -> pd.DataFrame:
 
 
 def map_columns(df, column_map=COLUMN_MAP) -> pd.DataFrame:
+    """
+    Maps inconsistent column names to those used by Stedin
+    """
     return df.rename(columns=column_map)
 
 
