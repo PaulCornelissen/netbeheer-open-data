@@ -1,0 +1,66 @@
+liander had in 2009 2146887 active connections
+liander had in 2010 2161691 active connections
+liander had in 2011 2231369 active connections
+liander had in 2012 2244634 active connections
+liander had in 2013 2254515 active connections
+liander had in 2014 2262931 active connections
+liander had in 2015 2271643 active connections
+liander had in 2016 2503658 active connections
+liander had in 2017 2518880 active connections
+liander had in 2018 2515572 active connections
+liander had in 2019 2545069 active connections
+liander had in 2020 2553224 active connections
+liander had in 2021 2554807 active connections
+liander had in 2022 2548170 active connections
+liander had in 2023 2537745 active connections
+
+stedin had in 2009 1874010 active connections
+stedin had in 2010 1886550 active connections
+stedin had in 2011 1898316 active connections
+stedin had in 2012 1909515 active connections
+stedin had in 2013 1912466 active connections
+stedin had in 2014 1917270 active connections
+stedin had in 2015 1921417 active connections
+stedin had in 2016 1929326 active connections
+stedin had in 2017 1939532 active connections
+stedin had in 2018 1930221 active connections
+stedin had in 2019 1921042 active connections
+stedin had in 2020 1937140 active connections
+stedin had in 2021 1936452 active connections
+stedin had in 2022 1928259 active connections
+stedin had in 2023 1916551 active connections
+
+enexis had in 2010 1731855 active connections
+enexis had in 2011 1749591 active connections
+enexis had in 2012 1932584 active connections
+enexis had in 2013 2017585 active connections
+enexis had in 2014 2025636 active connections
+enexis had in 2015 2033569 active connections
+enexis had in 2016 1819596 active connections
+enexis had in 2017 2236855 active connections
+enexis had in 2018 2283321 active connections
+enexis had in 2019 2293642 active connections
+enexis had in 2020 2299996 active connections
+enexis had in 2021 2299115 active connections
+enexis had in 2022 2290843 active connections
+enexis had in 2023 2279554 active connections
+
+westland-infra had in 2011 49679 active connections
+westland-infra had in 2012 50167 active connections
+westland-infra had in 2013 50625 active connections
+westland-infra had in 2014 51077 active connections
+westland-infra had in 2015 51407 active connections
+westland-infra had in 2016 52028 active connections
+westland-infra had in 2017 52528 active connections
+westland-infra had in 2018 53120 active connections
+westland-infra had in 2019 48585 active connections
+westland-infra had in 2020 54282 active connections
+westland-infra had in 2021 54282 active connections
+westland-infra had in 2022 54707 active connections
+westland-infra had in 2023 54785 active connections
+{
+    "liander": {"2009": 2146887, "2010": 2161691, "2011": 2231369, "2012": 2244634, "2013": 2254515, "2014": 2262931, "2015": 2271643, "2016": 2503658, "2017": 2518880, "2018": 2515572, "2019": 2545069, "2020": 2553224, "2021": 2554807, "2022": 2548170, "2023": 2537745}, 
+    "stedin": {"2009": 1874010, "2010": 1886550, "2011": 1898316, "2012": 1909515, "2013": 1912466, "2014": 1917270, "2015": 1921417, "2016": 1929326, "2017": 1939532, "2018": 1930221, "2019": 1921042, "2020": 1937140, "2021": 1936452, "2022": 1928259, "2023": 1916551}, 
+    "enexis": {"2010": 1731855, "2011": 1749591, "2012": 1932584, "2013": 2017585, "2014": 2025636, "2015": 2033569, "2016": 1819596, "2017": 2236855, "2018": 2283321, "2019": 2293642, "2020": 2299996, "2021": 2299115, "2022": 2290843, "2023": 2279554},
+    "westland-infra": {"2011": 49679, "2012": 50167, "2013": 50625, "2014": 51077, "2015": 51407, "2016": 52028, "2017": 52528, "2018": 53120, "2019": 48585, "2020": 54282, "2021": 54282, "2022": 54707, "2023": 54785}
+}
