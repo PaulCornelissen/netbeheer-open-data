@@ -1,4 +1,5 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
+import time
 from data_loader import df_by_src_year, DSO
 import json
 import pandas as pd
@@ -9,7 +10,7 @@ PCV = "POSTCODE_VAN"
 PCT = "POSTCODE_TOT"
 
 DATA = {
-    "liander": {
+    DSO.LIANDER: {
         2009: {},
         2010: {"separator": ";"},
         2011: {},
@@ -25,7 +26,7 @@ DATA = {
         2021: {},
         2022: {},
     },
-    "stedin": {
+    DSO.STEDIN: {
         2009: {},
         2010: {},
         2011: {},
@@ -42,7 +43,7 @@ DATA = {
         2022: {},
         2023: {},
     },
-    "enexis": {
+    DSO.ENEXIS: {
         2010: {"separator": ";"},
         2011: {"separator": ";"},
         2012: {"separator": ";"},
@@ -58,20 +59,20 @@ DATA = {
         2022: {"separator": ";"},
         2023: {"separator": ";"},
     },
-    "westland-infra": {
-        2011: {"separator": "\t"},
-        2012: {"separator": "\t"},
-        2013: {"separator": "\t"},
-        2014: {"separator": "\t"},
-        2015: {"separator": "\t"},
-        2016: {"separator": "\t"},
-        2017: {"separator": "\t"},
-        2018: {"separator": "\t"},
-        2019: {"separator": "\t"},
-        2020: {"separator": "\t"},
-        2021: {"separator": "\t"},
-        2022: {"separator": "\t"},
-        2023: {"separator": "\t"},
+    DSO.WESTLAND: {
+        2011: {},
+        2012: {},
+        2013: {},
+        2014: {},
+        2015: {},
+        2016: {},
+        2017: {},
+        2018: {},
+        2019: {},
+        2020: {},
+        2021: {},
+        2022: {},
+        2023: {},
     },
 }
 
@@ -113,6 +114,10 @@ DROP_MAP_2 = ["AANSLUITINGEN_AANTAL", "FYSIEKE_STATUS_PERC"]
 
 
 def get_active_connections(df) -> pd.DataFrame:
+    """
+    Calculates Active Connections by multiplying number of connections with active percentage.
+    Returns DataFrame containing the results.
+    """
     return df.apply(lambda row: row.AANSLUITINGEN_AANTAL * row.FYSIEKE_STATUS_PERC / 100, axis=1).round().astype(int)
 
 
@@ -135,8 +140,9 @@ def set_postal_code_index(df) -> pd.DataFrame:
     return df.set_index([PCV, PCT])
 
 
-def calculate_active_connections(name: str, year: int, kwargs: dict) -> Tuple[int, pd.DataFrame]:
-    df = df_by_src_year(dso=name, year=year, **kwargs)
+def calculate_active_connections(dso: DSO, year: int, kwargs: dict) -> Tuple[int, pd.DataFrame]:
+    tic: float = time.perf_counter()
+    df = df_by_src_year(dso=dso, year=year, **kwargs)
     df = map_columns(df)
     df = filter_product_type(df, productsoort="GAS")
     df = filter_columns(df)
@@ -146,7 +152,8 @@ def calculate_active_connections(name: str, year: int, kwargs: dict) -> Tuple[in
     df = set_postal_code_index(df)
     df = filter_columns(df, columns=DROP_MAP_2)
     df = map_columns(df, column_map={AA: year})
-    print(f"{name} had in {year} {total} active connections")
+    toc: float = time.perf_counter()
+    print(f"{dso.value} had in {year} {total} active connections in {toc - tic:0.4f} seconds")
     return int(total), df
 
 
@@ -162,16 +169,19 @@ def calculate_yearly_diff(df: pd.DataFrame) -> pd.DataFrame:
         df[f"{cur}_DIFF"] = df[next] - df[cur]
     return df
 
-
-results = {}
-datasets = {}
-for dso, years in DATA.items():
-    results[dso] = {}
-    dataframes = []
+def for_years(results: dict, dso: DSO, years: Dict[int, dict], dataframes):
     for year, kwargs in years.items():
-        results[dso][year], df = calculate_active_connections(name=dso, year=year, kwargs=kwargs)
+        results[dso][year], df = calculate_active_connections(dso=dso, year=year, kwargs=kwargs)
         dataframes.append(df)
-    # consolidated_data = consolidate_years(dataframes)
-    # consolidated_data = calculate_yearly_diff(consolidated_data)
 
-print(json.dumps(results))
+if __name__ == "__main__":
+    results = {}
+    datasets = {}
+    for dso, years in DATA.items():
+        results[dso] = {}
+        dataframes = []
+        for_years(results, dso, years, dataframes)
+        # consolidated_data = consolidate_years(dataframes)
+        # consolidated_data = calculate_yearly_diff(consolidated_data)
+
+    print(json.dumps(results))
