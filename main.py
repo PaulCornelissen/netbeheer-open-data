@@ -26,6 +26,8 @@ DATA = {
         2021: {},
         2022: {},
         2023: {},
+        2024: {"separator": ";"},
+        # 2025: {"separator": ";"},
     },
     DSO.STEDIN: {
         2009: {},
@@ -43,6 +45,8 @@ DATA = {
         2021: {},
         2022: {},
         2023: {},
+        2024: {},
+        2025: {},
     },
     DSO.ENEXIS: {
         2010: {"separator": ";"},
@@ -59,6 +63,8 @@ DATA = {
         2021: {"separator": ";"},
         2022: {"separator": ";"},
         2023: {"separator": ";"},
+        2024: {"separator": ";"},
+        2025: {"separator": ";"},
     },
     DSO.WESTLAND: {
         2011: {},
@@ -74,6 +80,7 @@ DATA = {
         2021: {},
         2022: {},
         2023: {},
+        2024: {},
     },
 }
 
@@ -119,7 +126,13 @@ def get_active_connections(df) -> pd.DataFrame:
     Calculates Active Connections by multiplying number of connections with active percentage.
     Returns DataFrame containing the results.
     """
-    return df.apply(lambda row: row.AANSLUITINGEN_AANTAL * row.FYSIEKE_STATUS_PERC / 100, axis=1).round().astype(int)
+    return (
+        df.apply(
+            lambda row: row.AANSLUITINGEN_AANTAL * row.FYSIEKE_STATUS_PERC / 100, axis=1
+        )
+        .round()
+        .astype(int)
+    )
 
 
 def map_columns(df, column_map=COLUMN_MAP) -> pd.DataFrame:
@@ -141,7 +154,9 @@ def set_postal_code_index(df) -> pd.DataFrame:
     return df.set_index([PCV, PCT])
 
 
-def calculate_active_connections(dso: DSO, year: int, kwargs: dict) -> Tuple[int, pd.DataFrame]:
+def calculate_active_connections(
+    dso: DSO, year: int, kwargs: dict
+) -> Tuple[int, pd.DataFrame]:
     tic: float = time.perf_counter()
     df = df_by_src_year(dso=dso, year=year, **kwargs)
     df = map_columns(df)
@@ -154,7 +169,9 @@ def calculate_active_connections(dso: DSO, year: int, kwargs: dict) -> Tuple[int
     df = filter_columns(df, columns=DROP_MAP_2)
     df = map_columns(df, column_map={AA: year})
     toc: float = time.perf_counter()
-    print(f"{dso.value} had in {year} {total} active connections in {toc - tic:0.4f} seconds")
+    print(
+        f"{dso.value} had in {year} {total} active connections in {toc - tic:0.4f} seconds"
+    )
     return int(total), df
 
 
@@ -170,10 +187,14 @@ def calculate_yearly_diff(df: pd.DataFrame) -> pd.DataFrame:
         df[f"{cur}_DIFF"] = df[next] - df[cur]
     return df
 
+
 def for_years(results: dict, dso: DSO, years: Dict[int, dict], dataframes):
     for year, kwargs in years.items():
-        results[dso][year], df = calculate_active_connections(dso=dso, year=year, kwargs=kwargs)
+        results[dso][year], df = calculate_active_connections(
+            dso=dso, year=year, kwargs=kwargs
+        )
         dataframes.append(df)
+
 
 if __name__ == "__main__":
     results = {}

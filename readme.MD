@@ -3,7 +3,7 @@
 Currently the parser calculates active GAS connection per year per DSO.
 
 The CSV files have been taken from the websites of the respective DSO's:
-* https://www.liander.nl/partners/datadiensten/open-data/data
+* https://www.liander.nl/over-ons/open-data
 * https://www.enexis.nl/over-ons/open-data
 * https://www.stedin.net/zakelijk/open-data/verbruiksgegevens
 * https://www.westlandinfra.nl/over-westland-infra/duurzaamheid-innovaties/open-data
