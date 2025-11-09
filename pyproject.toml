@@ -1,0 +1,9 @@
+[project]
+name = "netbeheer-open-data"
+version = "0.1.0"
+description = "Collect and parse DSO Open Data"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pandas>=2.3.3",
+]
