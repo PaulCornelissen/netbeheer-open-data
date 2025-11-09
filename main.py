@@ -129,6 +129,13 @@ def get_active_connections(df) -> pd.DataFrame:
     Calculates Active Connections by multiplying number of connections with active percentage.
     Returns DataFrame containing the results.
     """
+    required = {AANT, FSP}
+    missing = required.difference(df.columns)
+    if missing:
+        missing_cols = ", ".join(sorted(missing))
+        raise KeyError(
+            f"Missing required columns for active connection calculation: {missing_cols}"
+        )
     return (
         df.apply(
             lambda row: row.AANSLUITINGEN_AANTAL * row[FSP] / 100, axis=1
@@ -142,7 +149,14 @@ def map_columns(df, column_map=COLUMN_MAP) -> pd.DataFrame:
     """
     Maps inconsistent column names to those used by Stedin
     """
-    return df.rename(columns=column_map)
+    def _normalize(name):
+        if not isinstance(name, str):
+            return name
+        return name.strip().strip('"').upper()
+
+    df.columns = [_normalize(col) for col in df.columns]
+    normalized_map = {_normalize(src): dest for src, dest in column_map.items()}
+    return df.rename(columns=normalized_map)
 
 
 def filter_columns(df, columns=DROP_MAP) -> pd.DataFrame:
@@ -150,7 +164,8 @@ def filter_columns(df, columns=DROP_MAP) -> pd.DataFrame:
 
 
 def filter_product_type(df, productsoort="GAS") -> pd.DataFrame:
-    return df[(df[PS] == productsoort)]
+    normalized = df[PS].astype(str).str.strip().str.upper()
+    return df[normalized == productsoort]
 
 
 def set_postal_code_index(df) -> pd.DataFrame:
@@ -165,7 +180,10 @@ def calculate_active_connections(
     df = map_columns(df)
     df = filter_product_type(df, productsoort="GAS")
     df = filter_columns(df)
-    df[AA] = get_active_connections(df)
+    try:
+        df[AA] = get_active_connections(df)
+    except KeyError as exc:
+        raise KeyError(f"{dso.value} {year}: {exc}") from exc
     total = df[AA].sum()
     # Let's try to match different years by postal code so we can detect differences by PC
     df = set_postal_code_index(df)
