@@ -8,6 +8,8 @@ AA = "ACTIEVE_AANSLUITINGEN"
 PS = "PRODUCTSOORT"
 PCV = "POSTCODE_VAN"
 PCT = "POSTCODE_TOT"
+FSP = "FYSIEKE_STATUS_PERC"
+AANT = "AANSLUITINGEN_AANTAL"
 
 DATA = {
     DSO.LIANDER: {
@@ -85,9 +87,10 @@ DATA = {
 }
 
 COLUMN_MAP = {
-    "Aantal Aansluitingen": "AANSLUITINGEN_AANTAL",
-    "Aantal aansluitingen": "AANSLUITINGEN_AANTAL",
-    "aantal aansluitingen": "AANSLUITINGEN_AANTAL",
+    "Aantal Aansluitingen": AANT,
+    "Aantal aansluitingen": AANT,
+    "aantal aansluitingen": AANT,
+    "aansluiting_aantal" : AANT,
     "%Leveringsrichting": "LEVERINGSRICHTING_PERC",
     "%Fysieke status": "FYSIEKE_STATUS_PERC",
     "%Soort aansluiting": "SOORT_AANSLUITING_PERC",
@@ -118,7 +121,7 @@ DROP_MAP = [
     "NETGEBIED",
 ]
 
-DROP_MAP_2 = ["AANSLUITINGEN_AANTAL", "FYSIEKE_STATUS_PERC"]
+DROP_MAP_2 = [AANT, FSP]
 
 
 def get_active_connections(df) -> pd.DataFrame:
@@ -128,7 +131,7 @@ def get_active_connections(df) -> pd.DataFrame:
     """
     return (
         df.apply(
-            lambda row: row.AANSLUITINGEN_AANTAL * row.FYSIEKE_STATUS_PERC / 100, axis=1
+            lambda row: row.AANSLUITINGEN_AANTAL * row[FSP] / 100, axis=1
         )
         .round()
         .astype(int)
