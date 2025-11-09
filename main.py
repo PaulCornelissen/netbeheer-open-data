@@ -137,9 +137,9 @@ def get_active_connections(df) -> pd.DataFrame:
             f"Missing required columns for active connection calculation: {missing_cols}"
         )
     return (
-        df.apply(
-            lambda row: row.AANSLUITINGEN_AANTAL * row[FSP] / 100, axis=1
-        )
+        df[AANT]
+        .mul(df[FSP])
+        .div(100)
         .round()
         .astype(int)
     )
