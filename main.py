@@ -2,6 +2,7 @@ from concurrent.futures import ProcessPoolExecutor
 import os
 import time
 from data_loader import df_by_src_year, DSO
+from visualization import plot_connection_graphs
 import json
 import pandas as pd
 from utils import timed_section, format_profile_summary
@@ -249,6 +250,7 @@ if __name__ == "__main__":
     datasets = {dso: [] for dso in DATA}
     profiling_data: list[dict[str, float]] = []
 
+    generated_graphs = {}
     if jobs:
         max_workers = min(len(jobs), os.cpu_count() or 1)
         with ProcessPoolExecutor(max_workers=max_workers) as pool:
@@ -265,6 +267,7 @@ if __name__ == "__main__":
         # Example usage:
         # consolidated_data = consolidate_years(datasets[dso])
         # consolidated_data = calculate_yearly_diff(consolidated_data)
+        generated_graphs = plot_connection_graphs(results)
 
     if ENABLE_PROFILING and profiling_data:
         print(format_profile_summary(profiling_data))
@@ -272,3 +275,7 @@ if __name__ == "__main__":
     print(json.dumps(results))
     toc: float = time.perf_counter()
     print(f"Finished processing in {toc - tic:0.4f} seconds")
+    if generated_graphs:
+        print("\nGenerated visualizations:")
+        for graph_id, path in generated_graphs.items():
+            print(f" - {graph_id}: {path}")

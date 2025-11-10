@@ -1,0 +1,35 @@
+axes:
+  x_label: Year
+  y_label: Active gas connections
+output_dir: figures
+year_ranges:
+  liander:
+    start_year: 2009
+    end_year: 2024
+    title: Liander active gas connections
+    graph_id: liander
+    color: "#2E7DAF"
+  stedin:
+    start_year: 2009
+    end_year: 2025
+    title: Stedin active gas connections
+    graph_id: stedin
+    color: "#A64B2A"
+  enexis:
+    start_year: 2010
+    end_year: 2025
+    title: Enexis active gas connections
+    graph_id: enexis
+    color: "#4C9F50"
+  westland-infra:
+    start_year: 2011
+    end_year: 2024
+    title: Westland Infra active gas connections
+    graph_id: westland_infra
+    color: "#F6BE00"
+  all_dsos:
+    start_year: 2010
+    end_year: 2024
+    title: Total active gas connections
+    graph_id: all_dsos
+    color: "#5A4A9C"
