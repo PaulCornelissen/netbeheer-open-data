@@ -1,4 +1,6 @@
 from typing import List, Tuple, Dict
+from concurrent.futures import ProcessPoolExecutor
+import os
 import time
 from data_loader import df_by_src_year, DSO
 import json
@@ -191,7 +193,7 @@ def calculate_active_connections(
     df = map_columns(df, column_map={AA: year})
     toc: float = time.perf_counter()
     print(
-        f"{dso.value} had in {year} {total} active connections in {toc - tic:0.4f} seconds"
+        f"{dso.value} had in {year} {total} active connections"
     )
     return int(total), df
 
@@ -209,22 +211,40 @@ def calculate_yearly_diff(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def for_years(results: dict, dso: DSO, years: Dict[int, dict], dataframes):
-    for year, kwargs in years.items():
-        results[dso][year], df = calculate_active_connections(
-            dso=dso, year=year, kwargs=kwargs
-        )
-        dataframes.append(df)
+def _process_job(args: Tuple[DSO, int, Dict]) -> Tuple[DSO, int, int, pd.DataFrame]:
+    """
+    Helper to make calculate_active_connections picklable for ProcessPoolExecutor.
+    """
+    dso, year, kwargs = args
+    total, df = calculate_active_connections(dso=dso, year=year, kwargs=kwargs)
+    return dso, year, total, df
 
 
 if __name__ == "__main__":
-    results = {}
-    datasets = {}
-    for dso, years in DATA.items():
-        results[dso] = {}
-        dataframes = []
-        for_years(results, dso, years, dataframes)
-        # consolidated_data = consolidate_years(dataframes)
-        # consolidated_data = calculate_yearly_diff(consolidated_data)
+    tic: float = time.perf_counter()
+    jobs = [
+        (dso, year, kwargs)
+        for dso, years in DATA.items()
+        for year, kwargs in years.items()
+    ]
 
+    results = {dso: {} for dso in DATA}
+    datasets = {dso: [] for dso in DATA}
+
+    if jobs:
+        max_workers = min(len(jobs), os.cpu_count() or 1)
+        with ProcessPoolExecutor(max_workers=max_workers) as pool:
+            for dso, year, total, df in pool.map(_process_job, jobs):
+                results[dso][year] = total
+                datasets[dso].append((year, df))
+
+        datasets = {
+            dso: [df for year, df in sorted(entries, key=lambda item: item[0])]
+            for dso, entries in datasets.items()
+        }
+        # Example usage:
+        # consolidated_data = consolidate_years(datasets[dso])
+        # consolidated_data = calculate_yearly_diff(consolidated_data)
     print(json.dumps(results))
+    toc: float = time.perf_counter()
+    print(f"Finished processing in {toc - tic:0.4f} seconds")
