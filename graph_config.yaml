@@ -5,13 +5,13 @@ output_dir: figures
 year_ranges:
   liander:
     start_year: 2009
-    end_year: 2024
+    end_year: 2026
     title: Liander active gas connections
     graph_id: liander
     color: "#2E7DAF"
   stedin:
     start_year: 2009
-    end_year: 2025
+    end_year: 2026
     title: Stedin active gas connections
     graph_id: stedin
     color: "#A64B2A"

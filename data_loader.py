@@ -20,11 +20,17 @@ def df_by_src_year(dso: DSO, year: int = 2022, separator: str = "\t") -> pd.Data
     """
     dso_name = dso.value
     path: str = path_from(path_from("data", dso_name), f"{dso_name}-{year}.csv")
-    return pd.read_csv(
-        path,
-        sep=separator,
-        engine="python",
-        decimal=",",
-        on_bad_lines="warn",
-        encoding_errors="ignore",
-    )
+    for encoding in ("utf-8-sig", "latin1"):
+        try:
+            return pd.read_csv(
+                path,
+                sep=separator,
+                engine="python",
+                decimal=",",
+                on_bad_lines="warn",
+                encoding=encoding,
+            )
+        except UnicodeDecodeError:
+            continue
+
+    raise ValueError(f"Unable to read {path} as utf-8-sig or latin1")

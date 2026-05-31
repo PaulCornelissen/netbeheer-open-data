@@ -40,3 +40,7 @@ Run `uv run python main.py` to parse data, calculate results and generate the SV
 
 ## Connection visualizations
 Graph generation is controlled through `graph_config.yaml`.
+Run `main.py` to parse data and calculate results.
+
+# Other data sources
+https://solarmagazine.nl/nieuws-zonne-energie/i36845/waarschuwing-enexis-na-recordinvestering-bedrijven-overzien-gevolgen-vol-stroomnet-niet

@@ -33,7 +33,8 @@ DATA = {
         2022: {},
         2023: {},
         2024: {"separator": ";"},
-        # 2025: {"separator": ";"},
+        2025: {"separator": ";"},
+        2026: {},
     },
     DSO.STEDIN: {
         2009: {},
@@ -53,6 +54,7 @@ DATA = {
         2023: {},
         2024: {},
         2025: {},
+        2026: {"separator": ";"},
     },
     DSO.ENEXIS: {
         2010: {"separator": ";"},
@@ -91,6 +93,8 @@ DATA = {
 }
 
 COLUMN_MAP = {
+    "POSTCODE": PCV,
+    "POSTCODE_EIND": PCT,
     "Aantal Aansluitingen": AANT,
     "Aantal aansluitingen": AANT,
     "aantal aansluitingen": AANT,
@@ -100,7 +104,10 @@ COLUMN_MAP = {
     "%Soort aansluiting": "SOORT_AANSLUITING_PERC",
     "Soort aansluiting Naam": "SOORT_AANSLUITING",
     "SJV": "SJV_GEMIDDELD",
+    "SJA GEMIDDELD": "SJV_GEMIDDELD",
+    "SJA_GEMIDDELD": "SJV_GEMIDDELD",
     "%SJV laag tarief": "SJV_LAAG_TARIEF_PERC",
+    "SJA_LAAG_TARIEF_PERC": "SJV_LAAG_TARIEF_PERC",
     "%Slimme Meter": "SLIMME_METER_PERC",
 }
 
@@ -128,6 +135,17 @@ DROP_MAP = [
 DROP_MAP_2 = [AANT, FSP]
 
 
+def normalize_column_label(label) -> str:
+    return " ".join(str(label).replace("\ufeff", "").strip().split())
+
+
+def numeric_series(series: pd.Series) -> pd.Series:
+    return pd.to_numeric(
+        series.astype(str).str.strip().str.replace(",", ".", regex=False),
+        errors="coerce",
+    )
+
+
 def get_active_connections(df) -> pd.DataFrame:
     """
     Calculates Active Connections by multiplying number of connections with active percentage.
@@ -141,8 +159,8 @@ def get_active_connections(df) -> pd.DataFrame:
             f"Missing required columns for active connection calculation: {missing_cols}"
         )
     return (
-        df[AANT]
-        .mul(df[FSP])
+        numeric_series(df[AANT])
+        .mul(numeric_series(df[FSP]))
         .div(100)
         .round()
         .astype(int)
@@ -156,11 +174,19 @@ def map_columns(df, column_map=COLUMN_MAP) -> pd.DataFrame:
     def _normalize(name):
         if not isinstance(name, str):
             return name
-        return name.strip().strip('"').upper()
+        return normalize_column_label(name).strip('"').upper()
 
     df.columns = [_normalize(col) for col in df.columns]
     normalized_map = {_normalize(src): dest for src, dest in column_map.items()}
     return df.rename(columns=normalized_map)
+
+
+def fill_missing_active_percentage(df, dso: DSO, year: int) -> pd.DataFrame:
+    if FSP in df.columns:
+        return df
+    if dso == DSO.LIANDER and year >= 2025:
+        df[FSP] = 100
+    return df
 
 
 def filter_columns(df, columns=DROP_MAP) -> pd.DataFrame:
@@ -173,6 +199,8 @@ def filter_product_type(df, productsoort="GAS") -> pd.DataFrame:
 
 
 def set_postal_code_index(df) -> pd.DataFrame:
+    df[PCV] = df[PCV].astype(str).str.replace(" ", "", regex=False).str.strip()
+    df[PCT] = df[PCT].astype(str).str.replace(" ", "", regex=False).str.strip()
     return df.set_index([PCV, PCT])
 
 
@@ -187,6 +215,8 @@ def calculate_active_connections(
         df = map_columns(df)
     with timed_section(profile, "filter_product_type"):
         df = filter_product_type(df, productsoort="GAS")
+    with timed_section(profile, "fill_missing_active_percentage"):
+        df = fill_missing_active_percentage(df, dso, year)
     with timed_section(profile, "filter_columns_primary"):
         df = filter_columns(df)
     try:
